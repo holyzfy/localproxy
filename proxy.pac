@@ -2,13 +2,13 @@ var port = {{port}};
 var urlMap = {{urlMap}};
 
 function FindProxyForURL(url, host) {
-    urlMap.forEach(function(item) {
-        var regex = new RegExp('^' + item.from);
-        var match = regex.test(url);
-        if(match) {
-            return 'http://127.0.0.1:' + port;
-        }
+    var match = urlMap.filter(function(item) {
+        return url.slice(0, item.from.length) === item.from;
     });
+    
+    if(match.length > 0) {
+        return 'PROXY 127.0.0.1:' + port + '; DIRECT';
+    }
 
-    return "DIRECT";
+    return 'DIRECT';
 }
