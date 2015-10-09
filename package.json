@@ -1,0 +1,26 @@
+{
+  "name": "localproxy",
+  "version": "0.1.0",
+  "description": "将线上资源代理到本地",
+  "scripts": {
+    "test": "mocha test --no-timeouts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holyzfy/localproxy.git"
+  },
+  "keywords": [
+    "proxy"
+  ],
+  "author": "holyzfy <zhaofuyun202@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/holyzfy/localproxy/issues"
+  },
+  "homepage": "https://github.com/holyzfy/localproxy",
+  "dependencies": {
+    "config": "^1.16.0",
+    "expect.js": "^0.3.1",
+    "express": "^4.13.3"
+  }
+}
