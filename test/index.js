@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var proxyquire = require('proxyquire');
-var index = require('../index.js');
 
 var myConfig = {
     port: 8089,
@@ -20,10 +19,6 @@ var proxyIndex = proxyquire('../index.js', {
 });
 
 describe(__filename, function(){
-    it('config', function() {
-        var config = index._debug.config;
-        expect(config.port).to.be(8089);
-    });
 
     it('getPAC', function() {
         expect(proxyIndex._debug.config.map).to.have.length(2);
