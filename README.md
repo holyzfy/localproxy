@@ -56,9 +56,7 @@ PAC地址： ``http://127.0.0.1:8089/proxy.pac``
 
 ## 运行
 
-配置代理 `http://127.0.0.1:8089/proxy.pac`
-
-    node ./index.js
+    node index.js
 
 ## 测试
 
