@@ -84,11 +84,11 @@ describe(__filename, function(){
                 done();
             });
         });
-    
-        it('setPAC', function(done) {
-            proxyIndex._debug.setPAC('http://127.0.0.1:8089/proxy.pac', done);
-        });
     }
+    
+    it('setPAC', function(done) {
+        proxyIndex._debug.setPAC('http://127.0.0.1:8089/proxy.pac', done);
+    });
 
 
 });

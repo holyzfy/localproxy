@@ -81,7 +81,10 @@ if(/Darwin/i.test(os.type())) {
     };
 } else if(/windows/i.test(os.type())) {
     setPAC = function(url, callback) {
-        // TODO windows
+        var cmd = 'REG ADD "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v AutoConfigURL /d "{{url}}" /f'
+                    .replace('{{url}}', url);
+        debug('setPAC:', cmd);
+        runCmd(cmd, callback);
     };
 }
 
