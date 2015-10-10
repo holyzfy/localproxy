@@ -33,8 +33,8 @@ var runCmd = function(cmd, options, callback) {
         callback(err || stderr, stdout);
     });
 
-    eventEmitter.stdout.on('data', debug);
-    eventEmitter.stderr.on('data', debug);
+    // eventEmitter.stdout.on('data', debug);
+    // eventEmitter.stderr.on('data', debug);
 
     return eventEmitter;
 };
@@ -62,15 +62,21 @@ if(/Linux|Darwin/i.test(os.type())) {
 
             debug('network services=', list);
             
-            var iterator = function(item, cb) {
-                var cmd = 'networksetup -setautoproxyurl "{{service}}" "{{url}}"'
+            var tasks = [];
+
+            var run = function(item, cb) {
+                var cmd = 'sudo networksetup -setautoproxyurl "{{service}}" "{{url}}"'
                             .replace('{{service}}', item)
                             .replace('{{url}}', url);
                 debug('setPAC:', cmd);
                 runCmd(cmd, cb);
             };
 
-            async.each(list, iterator, callback);
+            list.forEach(function(item) {
+                tasks.push(run.bind(null, item));
+            });
+
+            async.series(tasks, callback);
         });
     };
 } else if(/windows/i.test(os.type())) {

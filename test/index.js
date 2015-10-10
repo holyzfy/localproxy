@@ -56,7 +56,7 @@ describe(__filename, function(){
 
     it('run 1', function() {
         var badCmd = 'a_bad_cmd';
-        expect(proxyIndex._debug.runCmd).withArgs(badCmd).to.not.throwException();
+        expect(proxyIndex._debug.runCmd).withArgs(badCmd, function() {}).to.not.throwException();
     });
 
     it('run 2', function(done) {
