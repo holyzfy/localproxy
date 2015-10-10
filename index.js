@@ -53,7 +53,7 @@ var getAllNetworkServices = function(callback) {
 
 var setPAC;
 
-if(/Linux|Darwin/i.test(os.type())) {
+if(/Darwin/i.test(os.type())) {
     setPAC = function(url, callback) {
         getAllNetworkServices(function(err, list) {
             if(err) {
