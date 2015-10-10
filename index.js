@@ -2,6 +2,10 @@ var config = require('config');
 var express = require('express');
 var read = require('read-file');
 var url = require('url');
+var exec = require('child_process').exec;
+var os = require('os');
+var async = require('async');
+var debug = require('debug')('localproxy:index.js');
 
 var getPAC = function() {
     var template = read.sync('proxy.pac', {encoding: 'utf8'});
@@ -22,7 +26,60 @@ var getStaticList = function(config) {
     return ret;
 };
 
-var startServer = function() {
+var runCmd = function(cmd, options, callback) {
+    callback = arguments[arguments.length - 1];
+
+    var eventEmitter = exec(cmd, options, function(err, stdout, stderr) {
+        callback(err || stderr, stdout);
+    });
+
+    eventEmitter.stdout.on('data', debug);
+    eventEmitter.stderr.on('data', debug);
+
+    return eventEmitter;
+};
+
+var getAllNetworkServices = function(callback) {
+    var cmd = 'networksetup -listallnetworkservices | tail +2';
+    runCmd(cmd, function(err, stdout) {
+        if(err) {
+            return callback(err);
+        }
+
+        var list = stdout.trim().split(/\r?\n/);
+        callback(null, list);
+    });
+};
+
+var setPAC;
+
+if(/Linux|Darwin/i.test(os.type())) {
+    setPAC = function(url, callback) {
+        getAllNetworkServices(function(err, list) {
+            if(err) {
+                return callback(err);
+            }
+
+            debug('network services=', list);
+            
+            var iterator = function(item, cb) {
+                var cmd = 'networksetup -setautoproxyurl "{{service}}" "{{url}}"'
+                            .replace('{{service}}', item)
+                            .replace('{{url}}', url);
+                debug('setPAC:', cmd);
+                runCmd(cmd, cb);
+            };
+
+            async.each(list, iterator, callback);
+        });
+    };
+} else if(/windows/i.test(os.type())) {
+    setPAC = function(url, callback) {
+        // TODO windows
+    };
+}
+
+var startServer = function(callback) {
     var app = express();
     var staticList = getStaticList(config);
     staticList.forEach(function(item) {
@@ -36,17 +93,20 @@ var startServer = function() {
         res.send(getPAC());
     });
 
-    app.listen(config.port, function() {
-        console.log('Server running at', config.port);
-    });
+    app.listen(config.port, callback);
 };
 
-startServer();
+startServer(function() {
+    console.log('Server running at', config.port);
+});
 
 module.exports = {
     _debug: {
         config: config,
         getPAC: getPAC,
-        getStaticList: getStaticList
+        getStaticList: getStaticList,
+        runCmd: runCmd,
+        getAllNetworkServices: getAllNetworkServices,
+        setPAC: setPAC
     }
 };
