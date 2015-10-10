@@ -155,7 +155,7 @@ var exitHandler = function() {
 
 startServer(function() {
     var url = 'http://127.0.0.1:{{port}}/proxy.pac'.replace('{{port}}', config.port);
-    setPAC(url, function() {
+    setPAC && setPAC(url, function() {
         console.log('set PAC:', url);
         console.log('Server running at', config.port);
         exitHandler();
