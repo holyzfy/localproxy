@@ -136,16 +136,16 @@ var startServer = function(callback) {
 
 var exitHandler = function() {
     var busy = false;
+
     var callback = function(options) {
+        process.stdin.resume();
         options = options || {};
         if(busy) {
             return;
         }
         busy = true;
-        process.stdin.resume();
         console.log('unset PAC');
-        unSetPAC();
-        process.exit();
+        unSetPAC(process.exit);
     };
 
     process.on('exit', callback);
