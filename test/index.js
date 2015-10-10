@@ -44,4 +44,13 @@ describe(__filename, function(){
         expect(ret).to.eql(expected);
     });
 
+    it('match', function() {
+        var url = 'http://dev.f2e.test.com/a_project/css/index.css'
+        var urlMap = myConfig.map;
+        var match = urlMap.some(function(item) {
+            return url.slice(0, item.from.length) === item.from;
+        });
+        expect(match).to.be.ok();
+    });
+
 });
