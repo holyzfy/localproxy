@@ -40,7 +40,7 @@
 
 ## 配置代理
 
-PAC地址： ``http://127.0.0.1:8089/proxy.pac``
+PAC地址： http://127.0.0.1:8089/proxy.pac
 
 ### Windows
 
