@@ -52,6 +52,7 @@ var getAllNetworkServices = function(callback) {
 };
 
 var setPAC;
+var unSetPAC;
 
 if(/Darwin/i.test(os.type())) {
     setPAC = function(url, callback) {
@@ -79,11 +80,39 @@ if(/Darwin/i.test(os.type())) {
             async.series(tasks, callback);
         });
     };
+
+    unSetPAC = function(callback) {
+        getAllNetworkServices(function(err, list) {
+            if(err) {
+                return callback(err);
+            }
+            
+            var tasks = [];
+
+            var run = function(item, cb) {
+                var cmd = 'sudo networksetup -setautoproxystate "{{service}}" off'
+                            .replace('{{service}}', item);
+                debug('unsetPAC:', cmd);
+                runCmd(cmd, cb);
+            };
+
+            list.forEach(function(item) {
+                tasks.push(run.bind(null, item));
+            });
+
+            async.series(tasks, callback);
+        });
+    };
 } else if(/windows/i.test(os.type())) {
     setPAC = function(url, callback) {
         var cmd = 'REG ADD "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v AutoConfigURL /d "{{url}}" /f'
                     .replace('{{url}}', url);
         debug('setPAC:', cmd);
+        runCmd(cmd, callback);
+    };
+
+    unSetPAC = function(callback) {
+        var cmd = 'REG ADD "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v AutoConfigURL /d "" /f';
         runCmd(cmd, callback);
     };
 }
@@ -105,8 +134,32 @@ var startServer = function(callback) {
     app.listen(config.port, callback);
 };
 
+var exitHandler = function() {
+    var busy = false;
+    var callback = function(options) {
+        options = options || {};
+        if(busy) {
+            return;
+        }
+        busy = true;
+        process.stdin.resume();
+        console.log('unset PAC');
+        unSetPAC();
+        process.exit();
+    };
+
+    process.on('exit', callback);
+    process.on('SIGINT', callback);
+    process.on('uncaughtException', callback);
+};
+
 startServer(function() {
-    console.log('Server running at', config.port);
+    var url = 'http://127.0.0.1:{{port}}/proxy.pac'.replace('{{port}}', config.port);
+    setPAC(url, function() {
+        console.log('set PAC:', url);
+        console.log('Server running at', config.port);
+        exitHandler();
+    });
 });
 
 module.exports = {
@@ -116,6 +169,7 @@ module.exports = {
         getStaticList: getStaticList,
         runCmd: runCmd,
         getAllNetworkServices: getAllNetworkServices,
-        setPAC: setPAC
+        setPAC: setPAC,
+        unSetPAC: unSetPAC
     }
 };

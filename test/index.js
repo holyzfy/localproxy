@@ -90,5 +90,9 @@ describe(__filename, function(){
         proxyIndex._debug.setPAC('http://127.0.0.1:8089/proxy.pac', done);
     });
 
+    it('unSetPAC', function(done) {
+        proxyIndex._debug.unSetPAC(done);
+    });
+
 
 });
