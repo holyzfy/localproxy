@@ -16,14 +16,12 @@ var getPAC = function() {
 };
 
 var getStaticList = function(config) {
-    var ret = [];
-    config.map.forEach(function(item) {
-        ret.push({
+    return config.map.map(function(item) {
+        return {
             path: url.parse(item.from).pathname,
             to: item.to
-        });
+        };
     });
-    return ret;
 };
 
 var runCmd = function(cmd, options, callback) {
@@ -58,8 +56,6 @@ if('Darwin' === os.type()) {
 
             debug('network services=', list);
             
-            var tasks = [];
-
             var run = function(item, cb) {
                 var cmd = 'sudo networksetup -setautoproxyurl "{{service}}" "{{url}}"'
                             .replace('{{service}}', item)
@@ -68,8 +64,8 @@ if('Darwin' === os.type()) {
                 runCmd(cmd, cb);
             };
 
-            list.forEach(function(item) {
-                tasks.push(run.bind(null, item));
+            var tasks = list.map(function(item) {
+                return run.bind(null, item);
             });
 
             async.series(tasks, callback);
@@ -82,8 +78,6 @@ if('Darwin' === os.type()) {
                 return callback(err);
             }
             
-            var tasks = [];
-
             var run = function(item, cb) {
                 var cmd = 'sudo networksetup -setautoproxystate "{{service}}" off'
                             .replace('{{service}}', item);
@@ -91,8 +85,8 @@ if('Darwin' === os.type()) {
                 runCmd(cmd, cb);
             };
 
-            list.forEach(function(item) {
-                tasks.push(run.bind(null, item));
+            var tasks = list.map(function(item) {
+                return run.bind(null, item);
             });
 
             async.series(tasks, callback);
