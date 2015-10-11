@@ -76,7 +76,7 @@ describe(__filename, function(){
         });
     });
 
-    if(/Darwin/i.test(os.type())) {
+    if('Darwin' === os.type()) {
         it('getAllNetworkServices', function(done) {
             proxyIndex._debug.getAllNetworkServices(function(err, ret) {
                 expect(err).to.be(null);

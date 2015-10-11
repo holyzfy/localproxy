@@ -29,14 +29,9 @@ var getStaticList = function(config) {
 var runCmd = function(cmd, options, callback) {
     callback = arguments[arguments.length - 1];
 
-    var eventEmitter = exec(cmd, options, function(err, stdout, stderr) {
+    return exec(cmd, options, function(err, stdout, stderr) {
         callback(err || stderr, stdout);
     });
-
-    // eventEmitter.stdout.on('data', debug);
-    // eventEmitter.stderr.on('data', debug);
-
-    return eventEmitter;
 };
 
 var getAllNetworkServices = function(callback) {
@@ -54,7 +49,7 @@ var getAllNetworkServices = function(callback) {
 var setPAC;
 var unSetPAC;
 
-if(/Darwin/i.test(os.type())) {
+if('Darwin' === os.type()) {
     setPAC = function(url, callback) {
         getAllNetworkServices(function(err, list) {
             if(err) {
@@ -103,7 +98,7 @@ if(/Darwin/i.test(os.type())) {
             async.series(tasks, callback);
         });
     };
-} else if(/windows/i.test(os.type())) {
+} else if('Windows_NT' === os.type()) {
     setPAC = function(url, callback) {
         var cmd = 'REG ADD "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v AutoConfigURL /d "{{url}}" /f'
                     .replace('{{url}}', url);
