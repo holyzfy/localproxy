@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "将线上资源代理到本地",
   "scripts": {
-    "test": "mocha test --no-timeouts"
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
